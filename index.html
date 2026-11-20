@@ -84,6 +84,26 @@
       gap: 10px;
     }
 
+    .btn-slide {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 6px;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    .btn-slide:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+      transform: scale(1.05);
+    }
+
     /* Indikator Badge dengan Efek Frosted Glass Blur */
     .badge {
       font-size: 0.85rem;
@@ -211,16 +231,18 @@
     <!-- Header Controls Overlay -->
     <div class="header-container">
       <div class="header-controls">
+        <button class="btn-slide" type="button" aria-label="Dashboard sebelumnya" onclick="switchSlide(-1)">&#8249;</button>
         <span class="badge" id="reportBadge">Report 1 dari 2</span>
+        <button class="btn-slide" type="button" aria-label="Dashboard berikutnya" onclick="switchSlide(1)">&#8250;</button>
         <button class="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen Mode</button>
       </div>
     </div>
 
     <!-- Dashboard Embed Area -->
     <div class="embed-container">
-      <iframe class="slide" src="https://datastudio.google.com:/embed/reporting/bf658269-0708-426b-8149-d1bad3d9c089/page/NjQ5F" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
       <iframe class="slide active" src="https://datastudio.google.com/embed/reporting/058ecc49-4fb8-4d47-96bd-a75fa74b03b8/page/Zs9CG" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
-    </div>
+      <iframe class="slide" src="https://datastudio.google.com:/embed/reporting/bf658269-0708-426b-8149-d1bad3d9c089/page/NjQ5F" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+      </div>
 
     <!-- Running Text Ticker Blur / Frosted Glass -->
     <div class="ticker-bar">
@@ -257,15 +279,15 @@
     updateTickerClock();
     setInterval(updateTickerClock, 1000);
 
-    // Slideshow Logic (15 Detik Loop)
+    // Slideshow Logic 
     const slides = document.querySelectorAll('.slide');
     const badge = document.getElementById('reportBadge');
     let currentIndex = 0;
-    const intervalTime = 300000; // 5 menit dalam milidetik
+    const intervalTime = 30000; // 30 detik
 
-    function switchSlide() {
+    function switchSlide(direction = 1) {
       slides[currentIndex].classList.remove('active');
-      currentIndex = (currentIndex + 1) % slides.length;
+      currentIndex = (currentIndex + direction + slides.length) % slides.length;
       slides[currentIndex].classList.add('active');
       badge.textContent = `Report ${currentIndex + 1} dari ${slides.length}`;
     }
