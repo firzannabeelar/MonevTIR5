@@ -41,7 +41,7 @@
       overflow: hidden;
     }
 
-    /* Hitbox Area Trigger Hover Khusus Bagian Atas Container (Tinggi 50px) */
+    /* Hitbox Area Trigger Hover/Tap Khusus Bagian Atas Container (Tinggi 50px) */
     .top-hover-trigger {
       position: absolute;
       top: 0;
@@ -70,9 +70,18 @@
       pointer-events: none;
     }
 
-    /* Trigger: Hanya Muncul Saat Kursor di Area Paling Atas / Pada Header itu Sendiri */
-    .top-hover-trigger:hover ~ .header-container,
-    .header-container:hover {
+    /* Trigger Desktop: Hanya Muncul Saat Mouse Pointer Di-hover (Mencegah Sticking pada Touchscreen) */
+    @media (hover: hover) {
+      .top-hover-trigger:hover ~ .header-container,
+      .header-container:hover {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+    }
+
+    /* Class Aktif untuk Touchscreen (Auto-Hide via JavaScript) */
+    .header-container.active {
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
@@ -183,10 +192,9 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background-color: rgba(114, 115, 118, 0.75); /* Transparan Gelap */
+      background-color: rgba(114, 115, 118, 0.75);
       backdrop-filter: blur(1px);
       -webkit-backdrop-filter: blur(1px);
-      /* border-top: 1px solid rgba(255, 255, 255, 0.15);*/
       color: #ffffff;
       overflow: hidden;
       white-space: nowrap;
@@ -229,7 +237,7 @@
     <div class="top-hover-trigger"></div>
 
     <!-- Header Controls Overlay -->
-    <div class="header-container">
+    <div class="header-container" id="headerContainer">
       <div class="header-controls">
         <button class="btn-slide" type="button" aria-label="Dashboard sebelumnya" onclick="switchSlide(-1)">&#8249;</button>
         <span class="badge" id="reportBadge">Report 1 dari 2</span>
@@ -242,7 +250,7 @@
     <div class="embed-container">
       <iframe class="slide active" src="https://datastudio.google.com/embed/reporting/058ecc49-4fb8-4d47-96bd-a75fa74b03b8/page/Zs9CG" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
       <iframe class="slide" src="https://datastudio.google.com:/embed/reporting/bf658269-0708-426b-8149-d1bad3d9c089/page/NjQ5F" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
-      </div>
+    </div>
 
     <!-- Running Text Ticker Blur / Frosted Glass -->
     <div class="ticker-bar">
@@ -290,6 +298,7 @@
       currentIndex = (currentIndex + direction + slides.length) % slides.length;
       slides[currentIndex].classList.add('active');
       badge.textContent = `Report ${currentIndex + 1} dari ${slides.length}`;
+      triggerHeaderAutoHide(); // Reset timer saat pindah slide
     }
 
     setInterval(switchSlide, intervalTime);
@@ -308,7 +317,27 @@
           document.exitFullscreen();
         }
       }
+      triggerHeaderAutoHide();
     }
+
+    // Touchscreen / Mobile Header Auto-Hide Logic
+    const headerContainer = document.getElementById('headerContainer');
+    const topTrigger = document.querySelector('.top-hover-trigger');
+    let hideHeaderTimeout;
+
+    function triggerHeaderAutoHide() {
+      headerContainer.classList.add('active');
+      clearTimeout(hideHeaderTimeout);
+      hideHeaderTimeout = setTimeout(() => {
+        headerContainer.classList.remove('active');
+      }, 3000); // Otomatis hilang setelah 3 detik tanpa interaksi
+    }
+
+    // Listener Touch & Click
+    topTrigger.addEventListener('touchstart', triggerHeaderAutoHide, { passive: true });
+    topTrigger.addEventListener('click', triggerHeaderAutoHide);
+    headerContainer.addEventListener('touchstart', triggerHeaderAutoHide, { passive: true });
+    headerContainer.addEventListener('click', triggerHeaderAutoHide);
   </script>
 
 </body>
